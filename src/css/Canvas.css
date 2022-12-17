@@ -1,0 +1,5 @@
+.Canvas canvas {
+    touch-action: none;
+    border: solid black;
+    
+}
