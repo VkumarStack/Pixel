@@ -1,0 +1,11 @@
+.SignIn {
+    position: relative;
+
+    display: flex;
+    flex-direction: column;
+}
+
+.SignIn form {
+    position: absolute;
+    top: 40px;
+}

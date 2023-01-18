@@ -1,0 +1,24 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      match /users/{userId} {
+        allow read: if true;
+        allow create: if validUser(userId);
+      }
+
+      function validUser(userId) {
+        return (request.auth.uid == userId) && existsAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username));
+      }
+
+      match /usernames/{username} {
+        allow read: if true;
+        allow create: if validName(username) && (username == username.lower());
+      }
+
+      function validName(username) {
+        return (request.auth.uid == request.resource.data.uid) && username.matches('[A-Za-z0-9_]{3,24}') && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == username;
+      }
+    }
+  }
+}
