@@ -1,11 +1,12 @@
-import React, { useRef, useState, useEffect } from "react"
 import { auth, db } from './firebase'
-import {createUserWithEmailAndPassword, signOut } from 'firebase/auth'
-import { useAuthState } from 'react-firebase-hooks/auth'
 import { doc, getDoc, writeBatch} from 'firebase/firestore'
+import {createUserWithEmailAndPassword, signOut } from 'firebase/auth'
+import React, { useRef, useState, useEffect } from "react"
+import { useAuthState } from 'react-firebase-hooks/auth'
 import { useNavigate } from "react-router-dom"
 
 function Register() {
+    // Auth Loading
     const [user, loading, error] = useAuthState(auth);
     const [username, setUsername] = useState(null);
     const [loadingUser, setLoadingUser] = useState(false);
@@ -35,14 +36,11 @@ function Register() {
                 <form onSubmit={(e) => {
                     e.preventDefault();
                     createUserWithEmailAndPassword(auth, e.target.email.value, e.target.password.value)
-                    .then((userCredential) => {
-                        console.log(userCredential)
-                    })
                     .catch((error) => {
                         console.log(error.message);
                         setErrorMessage("Invalid registration");
-                    })
-                    }}>
+                    });
+                }}>
                     <div className="form-pair">
                         <label htmlFor="email">Email</label>
                         <input type="email" id="email" name="email" required/>

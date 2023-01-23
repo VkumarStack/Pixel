@@ -24,7 +24,7 @@ function App() {
 function Main() {
   return (
     <div className="Main">
-      <Canvas/>
+      <Canvas dimension="10" size="400px" />
     </div>
   );
 }

@@ -1,45 +1,67 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
       match /users/{userId} {
         allow read: if true;
         allow create: if validUser(userId);
-        allow update: if request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio']);
+        allow update: if validUserUpdate(userId);
       }
 
       function validUser(userId) {
-        return (request.auth.uid == userId) && request.resource.data.keys().hasOnly(['username']) && existsAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username));
+        let resourceValidate = (request.auth.uid == userId) && request.resource.data.keys().hasOnly(['username']);
+        let batchValidate = existsAfter(/databases/$(database)/documents/usernames/$(request.resource.data.username));
+        return resourceValidate && batchValidate;
+      }
+
+      function validUserUpdate(userId) {
+        return request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio']) && request.resource.data.bio is string;
       }
 
       match /usernames/{username} {
         allow read: if true;
-        allow create: if validName(username) && (username == username.lower());
+        allow create: if validName(username);
       }
 
       function validName(username) {
-        return (request.auth.uid == request.resource.data.uid) && request.resource.data.keys().hasOnly(['uid']) && username.matches('[A-Za-z0-9_]{3,24}') && getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == username;
+        let resourceValidate = (request.auth.uid == request.resource.data.uid) && request.resource.data.keys().hasOnly(['uid']) && username.matches('[A-Za-z0-9_]{3,24}') && (username == username.lower()); 
+        let batchValidate = getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.username == username;
+        return resourceValidate && batchValidate;
       }
 
       match /users/{userId}/followers/{id} {
         allow read: if true;
-        allow create: if (request.auth.uid == id) && request.resource.data.keys().hasOnly(['time']) && request.resource.data.time is timestamp && validFollower(userId, id);
-        allow delete: if (request.auth.uid == id) && exists(/databases/$(database)/documents/users/$(id)/following/$(userId)) && !existsAfter(/databases/$(database)/documents/users/$(id)/following/$(userId));
+        allow create: if validFollower(userId, id);
+        allow delete: if validFollowerDelete(userId, id);
       }
 
       function validFollower(userId, id) {
-        return exists(/databases/$(database)/documents/users/$(id)) && existsAfter(/databases/$(database)/documents/users/$(id)/following/$(userId));
+        let resourceValidate = (request.auth.uid == id) && request.resource.data.keys().hasOnly(['time']) && request.resource.data.time is timestamp;
+        let batchValidate = exists(/databases/$(database)/documents/users/$(id)) && existsAfter(/databases/$(database)/documents/users/$(id)/following/$(userId));
+        return resourceValidate && batchValidate; 
+      }
+
+      function validFollowerDelete(userId, id) {
+        let resourceValidate = (request.auth.uid == id);
+        let batchValidate = exists(/databases/$(database)/documents/users/$(id)/following/$(userId)) && !existsAfter(/databases/$(database)/documents/users/$(id)/following/$(userId));
+        return resourceValidate && batchValidate;
       }
 
       match /users/{userId}/following/{id} {
         allow read: if true;
-        allow create: if (request.auth.uid == userId) && request.resource.data.keys().hasOnly(['time']) && request.resource.data.time is timestamp && validFollowing(userId, id);
-        allow delete: if (request.auth.uid == userId) && exists(/databases/$(database)/documents/users/$(id)/followers/$(userId)) && !existsAfter(/databases/$(database)/documents/users/$(id)/followers/$(userId));
+        allow create: if validFollowing(userId, id);
+        allow delete: if validFollowingDelete(userId, id)
       }
 
       function validFollowing(userId, id) {
-        return exists(/databases/$(database)/documents/users/$(id)) && existsAfter(/databases/$(database)/documents/users/$(id)/followers/$(userId));
+        let resourceValidate = (request.auth.uid == userId) && request.resource.data.keys().hasOnly(['time']) && request.resource.data.time is timestamp;
+        let batchValidate = exists(/databases/$(database)/documents/users/$(id)) && existsAfter(/databases/$(database)/documents/users/$(id)/followers/$(userId));
+        return resourceValidate && batchValidate;
       }
-    }
+
+      function validFollowingDelete(userId, id) {
+        let resourceValidate = request.auth.uid == userId;
+        let batchValidate = exists(/databases/$(database)/documents/users/$(id)/followers/$(userId)) && !existsAfter(/databases/$(database)/documents/users/$(id)/followers/$(userId));
+        return resourceValidate && batchValidate;        
+      }
   }
 }

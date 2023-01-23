@@ -1,13 +1,14 @@
 import React from "react"
 import '../css/Canvas.css'
-import { CANVAS_DIMENSION, convertToCellUnits, convertToGridUnits, fillCell, importCanvas } from './CanvasHelper';
+import canvasHelper from './CanvasHelper';
 
 class Canvas extends React.Component {
     constructor(props) {
         super(props);
+        this.canvasHelper = new canvasHelper(props.dimension || 100);
 
         this.canvasRef = React.createRef();
-        //
+
         this.canvasRef2 = React.createRef();
 
         this.clicking = false;
@@ -19,10 +20,9 @@ class Canvas extends React.Component {
     componentDidMount() {
         this.ctx = this.canvasRef.current.getContext('2d', {willReadFrequently: true});
 
-        //
         this.ctx2 = this.canvasRef2.current.getContext('2d');
 
-        this.cellLength = this.canvasRef.current.width / CANVAS_DIMENSION;
+        this.cellLength = this.canvasRef.current.width / (this.props.dimension || 100);
     }
 
     handleClick(e, mobile) {
@@ -31,8 +31,8 @@ class Canvas extends React.Component {
 
         this.clicking = true;
         let pos = this.getMousePosition(e, mobile);
-        let coords = convertToCellUnits(this.cellLength, pos);
-        fillCell(this.ctx, this.cellLength, coords.x, coords.y, this.color, this.width);
+        let coords = this.canvasHelper.convertToCellUnits(this.cellLength, pos);
+        this.canvasHelper.fillCell(this.ctx, this.cellLength, coords.x, coords.y, this.color, this.width);
         this.prevPos = {x: pos.x, y: pos.y};
     }
 
@@ -41,16 +41,16 @@ class Canvas extends React.Component {
             return
 
         let pos = this.getMousePosition(e, mobile);
-        let coords = convertToCellUnits(this.cellLength, pos);
+        let coords = this.canvasHelper.convertToCellUnits(this.cellLength, pos);
 
         if (this.prevPos.x === null)
         {
             this.prevPos = pos;
-            fillCell(this.ctx, this.cellLength, coords.x, coords.y, this.color, this.width);
+            this.canvasHelper.fillCell(this.ctx, this.cellLength, coords.x, coords.y, this.color, this.width);
             return;
         }
 
-        let prev = convertToCellUnits(this.cellLength, this.prevPos);
+        let prev = this.canvasHelper.convertToCellUnits(this.cellLength, this.prevPos);
         this.prevPos = pos;
 
         let currX = coords.x;
@@ -63,7 +63,7 @@ class Canvas extends React.Component {
 
         // If there is a gap between mouseMove events, do a linear fill between the two known positions
         while ((currX !== prevX) || (currY !== prevY)) {
-            fillCell(this.ctx, this.cellLength, prevX, prevY, this.color, this.width);
+            this.canvasHelper.fillCell(this.ctx, this.cellLength, prevX, prevY, this.color, this.width);
             if ((currX !== prevX))
             {
                 if (right)
@@ -79,7 +79,7 @@ class Canvas extends React.Component {
                     prevY -= 1;
             }
         }
-        fillCell(this.ctx, this.cellLength, coords.x, coords.y, this.color, this.width);
+        this.canvasHelper.fillCell(this.ctx, this.cellLength, coords.x, coords.y, this.color, this.width);
     }
 
     getMousePosition(e, mobile) {
@@ -99,10 +99,10 @@ class Canvas extends React.Component {
     }
 
     exportCanvas() {
-        let canvasArray = Array(4 * CANVAS_DIMENSION * CANVAS_DIMENSION);
-        for (let r = 0, i = 0; r < CANVAS_DIMENSION && i < canvasArray.length; r++) {
-            for (let c = 0; c < CANVAS_DIMENSION && i < canvasArray.length; c++, i+= 4) {
-                const pos = convertToGridUnits(this.cellLength, {x: c, y: r});
+        let canvasArray = Array(4 * (this.props.dimension || 100) * (this.props.dimension || 100));
+        for (let r = 0, i = 0; r < (this.props.dimension || 100) && i < canvasArray.length; r++) {
+            for (let c = 0; c < (this.props.dimension || 100) && i < canvasArray.length; c++, i+= 4) {
+                const pos = this.canvasHelper.convertToGridUnits(this.cellLength, {x: c, y: r});
                 const imageData = this.ctx.getImageData(pos.x, pos.y, 1, 1);
                 const data = imageData.data;
                 canvasArray[i] = data[0];
@@ -117,7 +117,7 @@ class Canvas extends React.Component {
     render() {
         return (
             <div className="Canvas">
-                <canvas width={"500px"} height={"500px"} ref={this.canvasRef} 
+                <canvas width={this.props.size || "500px"} height={this.props.size || "500px"} ref={this.canvasRef} 
                 onMouseDown={(e) => this.handleClick(e, false)}
                 onMouseUp={(e) => { this.clicking = false; }}
                 onMouseLeave={(e) => { 
@@ -132,7 +132,7 @@ class Canvas extends React.Component {
                 <input type="range" name="width" id="width" min="1" max="5" defaultValue="1" onChange={(e) => {this.width = e.target.value}}/>
                 <button type="button" onClick={(e) => {
                     const uint8array = new Uint8ClampedArray(this.exportCanvas());
-                    importCanvas(this.cellLength, this.ctx2, uint8array);
+                    this.canvasHelper.importCanvas(this.canvasRef2.current.width / (this.props.dimension || 100), this.ctx2, uint8array);
                 }}/>
 
                 <canvas className="testCanvas" width={"500"} height={"500"} ref={this.canvasRef2}></canvas>

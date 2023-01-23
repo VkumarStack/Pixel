@@ -1,11 +1,10 @@
 import React from 'react';
-import '../css/Header.css';
 import { auth, db } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { signOut } from 'firebase/auth';
 import { useNavigate, useLocation } from 'react-router-dom';
 import SignIn from './SignIn';
-
+import '../css/Header.css';
 
 function Header() {
     const [user, loading, error] = useAuthState(auth);
