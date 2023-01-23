@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useDocumentOnce } from 'react-firebase-hooks/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { db, auth } from './firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc, getDoc, setDoc, onSnapshot, updateDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 
 function Profile() {
@@ -19,14 +19,40 @@ function Profile() {
             return (
                 <div className="SignedInSelfProfile">
                     <h1> {profile.username} </h1>
-                    <button> Edit Bio </button>
+                    <form className="edit-bio" onSubmit={(e) =>{
+                        e.preventDefault();
+                        if (value)
+                            updateDoc(doc(db, "users", value.data().uid), { bio: e.target.bio.value });
+                    }}>
+                        <label htmlFor="bio"> Bio </label>
+                        <h1>{profile.bio}</h1>
+                        <textarea name="bio" id="bio" cols="30" rows="10"></textarea>
+                        <button type='submit'> Edit Bio </button>
+                    </form>
                 </div>
             );
         else if (user)
             return (
                 <div className="SignedInOtherProfile">
                     <h1> {profile.username} </h1>
-                    <button> Follow </button>
+                    <button onClick={async (e) => {
+                        await runTransaction(db, async (transaction) => {
+                            const followerRef = doc(db, "users", user.uid, "following", value.data().uid);
+                            const followeeRef = doc(db, "users", value.data().uid, "followers", user.uid);
+                            const followerDoc = await transaction.get(followerRef);
+                            const followeeDoc = await transaction.get(followeeRef);
+                            // Unfollow 
+                            if (followerDoc.exists() && followeeDoc.exists()) {
+                                transaction.delete(followerRef);
+                                transaction.delete(followeeRef);
+                            }
+                            else { // Unfollow
+                                transaction.set(followerRef, { time:  serverTimestamp()})
+                                transaction.set(followeeRef, { time: serverTimestamp()})
+                            }
+                        });
+
+                    }}> Follow </button>
                 </div>
             );
         else 
@@ -50,6 +76,14 @@ function Profile() {
 
     return(
         <div className="Profile">
+            <button onClick={async (e) => {
+                await runTransaction(db, async (transaction) => {
+                    const ref = doc(db, 'users', 'iIcfecUShCpUEyp4gJ8JqwVSFccl', 'following', 'deeznuts');
+                    const ref2 = doc(db, 'users', 'deeznuts', 'followers', 'iIcfecUShCpUEyp4gJ8JqwVSFccl');
+                    transaction.set(ref, {time: serverTimestamp()});
+                    transaction.set(ref2, {time: serverTimestamp()});
+                });
+            }}> TEST </button>
             {(error || errorProfile) && <h1> Something went wrong... </h1> }
             {(loading || loadProfile) && <h1> Loading... </h1> }
             {value && !value.data() && <h1> User does not exist! </h1> }
