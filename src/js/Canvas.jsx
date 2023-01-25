@@ -1,6 +1,7 @@
 import React from "react"
 import '../css/Canvas.css'
 import canvasHelper from './CanvasHelper';
+import Pako from "pako";
 
 class Canvas extends React.Component {
     constructor(props) {
@@ -9,20 +10,23 @@ class Canvas extends React.Component {
 
         this.canvasRef = React.createRef();
 
-        this.canvasRef2 = React.createRef();
-
         this.clicking = false;
         this.prevPos = { x: null, y: null};
         this.color = "#000000";
         this.width = 1;
+
     }
 
     componentDidMount() {
         this.ctx = this.canvasRef.current.getContext('2d', {willReadFrequently: true});
-
-        this.ctx2 = this.canvasRef2.current.getContext('2d');
-
         this.cellLength = this.canvasRef.current.width / (this.props.dimension || 100);
+        if (this.props.array)
+            this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
+    }
+
+    componentDidUpdate(prevProps) {
+        if (prevProps.array !== this.props.array)
+            this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
     }
 
     handleClick(e, mobile) {
@@ -111,33 +115,36 @@ class Canvas extends React.Component {
                 canvasArray[i + 3] = data[3];
             }
         }
-        return canvasArray;
+
+        console.log(Pako.deflate(new Uint8ClampedArray(canvasArray)));
+        return Pako.deflate(new Uint8ClampedArray(canvasArray));
     }
 
     render() {
-        return (
-            <div className="Canvas">
-                <canvas width={this.props.size || "500px"} height={this.props.size || "500px"} ref={this.canvasRef} 
-                onMouseDown={(e) => this.handleClick(e, false)}
-                onMouseUp={(e) => { this.clicking = false; }}
-                onMouseLeave={(e) => { 
-                    this.clicking = false; 
-                    this.prevPos = { x: null, y: null};
-                }}
-                onMouseMove={(e) => this.handleMouseMove(e, false)}
-                onTouchMove={(e) => this.handleMouseMove(e, true)}
-                onTouchStart={(e) => { this.handleClick(e, true) }}
-                onTouchEnd={(e) => { this.clicking = false; }}/>
-                <input type="color" onChange={(e) => {this.color = e.target.value }}/>
-                <input type="range" name="width" id="width" min="1" max="5" defaultValue="1" onChange={(e) => {this.width = e.target.value}}/>
-                <button type="button" onClick={(e) => {
-                    const uint8array = new Uint8ClampedArray(this.exportCanvas());
-                    this.canvasHelper.importCanvas(this.canvasRef2.current.width / (this.props.dimension || 100), this.ctx2, uint8array);
-                }}/>
-
-                <canvas className="testCanvas" width={"500"} height={"500"} ref={this.canvasRef2}></canvas>
-            </div>
-        );
+        if (this.props.editable)
+            return (
+                <div className="Canvas">
+                    <canvas width={this.props.size || "500px"} height={this.props.size || "500px"} ref={this.canvasRef} 
+                    onMouseDown={(e) => this.handleClick(e, false)}
+                    onMouseUp={(e) => { this.clicking = false; }}
+                    onMouseLeave={(e) => { 
+                        this.clicking = false; 
+                        this.prevPos = { x: null, y: null};
+                    }}
+                    onMouseMove={(e) => this.handleMouseMove(e, false)}
+                    onTouchMove={(e) => this.handleMouseMove(e, true)}
+                    onTouchStart={(e) => { this.handleClick(e, true) }}
+                    onTouchEnd={(e) => { this.clicking = false; }}/>
+                    <input type="color" onChange={(e) => {this.color = e.target.value }}/>
+                    <input type="range" name="width" id="width" min="1" max="5" defaultValue="1" onChange={(e) => {this.width = e.target.value}}/>
+                </div>
+            );
+        else 
+            return (
+                <div className="Canvas">
+                    <canvas width={this.props.size || "500px"} height={this.props.size || "500px"} ref={this.canvasRef} />
+                </div>
+            );
     }
 }
 

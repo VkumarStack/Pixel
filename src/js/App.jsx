@@ -24,7 +24,7 @@ function App() {
 function Main() {
   return (
     <div className="Main">
-      <Canvas dimension="10" size="400px" />
+      <Canvas dimension="100" size="400px" editable={true} />
     </div>
   );
 }

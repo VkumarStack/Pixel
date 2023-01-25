@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useDocumentOnce } from 'react-firebase-hooks/firestore';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { db, auth } from './firebase';
 import { doc, getDoc, setDoc, onSnapshot, updateDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
+import Canvas from './Canvas';
 
 function Profile() {
     let { username } = useParams();
@@ -12,12 +13,19 @@ function Profile() {
     const [loadProfile, setLoadingProfile] = useState(true);
     const [errorProfile, setErrorProfile] = useState(false);
     const [profile, setProfile] = useState(null);
+    const avatar = useRef(null);
     let unsub;
 
+    
     function profileRender() {
         if (user && user.uid === value.data().uid)
             return (
                 <div className="SignedInSelfProfile">
+                    <Canvas dimension="50" size="300px" editable={true} array={profile.avatar} ref={avatar}></Canvas>
+                    <button onClick={(e) => {
+                        if (value)
+                            updateDoc(doc(db, "users", value.data().uid), { avatar: Array.from(avatar.current.exportCanvas()) });
+                    }}>Update Icon</button>
                     <h1> {profile.username} </h1>
                     <form className="edit-bio" onSubmit={(e) =>{
                         e.preventDefault();
