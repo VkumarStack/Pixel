@@ -2,11 +2,13 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { useState } from 'react'
 import '../css/App.css'
 import { db } from './firebase'
-import {collection, query, orderBy, onSnapshot, getDocs, getDoc, doc } from 'firebase/firestore'
+import {collection, query, orderBy, onSnapshot, getDocs, getDoc, doc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore'
 import Canvas from './Canvas'
 import Register from './Register'
 import Header from './Header'
 import Profile from './Profile'
+import Drawing from './Drawing'
+import Timeline from './Timeline'
 
 function App() {
   return (
@@ -24,7 +26,7 @@ function App() {
 function Main() {
   return (
     <div className="Main">
-      <Canvas dimension="100" size="400px" editable={true} />
+      <Timeline></Timeline>
     </div>
   );
 }

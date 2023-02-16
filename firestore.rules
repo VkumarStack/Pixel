@@ -16,7 +16,7 @@ service cloud.firestore {
       function validUserUpdate(userId) {
         let avatar = request.resource.data.get('avatar', []);
         let avatarSize = 50;
-        return request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'avatar']) && request.resource.data.get('bio', '') is string && avatar is list && (avatar.size() == 0 || avatar.size() <= (avatarSize * avatarSize * 4 + 50));
+        return request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'avatar', 'timestamp']) && request.resource.data.get('bio', '') is string && request.resource.data.get('timestamp', request.time) is timestamp && avatar is list && (avatar.size() <= (avatarSize * avatarSize * 4 + 50));
       }
 
       match /usernames/{username} {
@@ -65,5 +65,28 @@ service cloud.firestore {
         let batchValidate = exists(/databases/$(database)/documents/users/$(id)/followers/$(userId)) && !existsAfter(/databases/$(database)/documents/users/$(id)/followers/$(userId));
         return resourceValidate && batchValidate;        
       }
+
+      match /users/{userId}/posts/{date} {
+        allow read: if true;
+        allow write: if request.auth.uid == userId && validDate(date) && validData() && validBatch(userId);
+      }
+
+      function validDate(date) {
+        let month = request.time.month() < 10 ? "0" + string(request.time.month()) : string(request.time.month());
+        let day = request.time.day() < 10 ? "0" + string(request.time.day()) : string(request.time.day());
+        let fulldate = string(request.time.year()) + "-" + month + "-" + day;
+        return fulldate == date;
+      }
+
+      function validData() {
+        let drawingSize = 100;
+        return request.resource.data.keys().hasOnly(['data', 'time']) && request.resource.data.time == request.time && request.resource.data.data is list && (request.resource.data.data.size() <= (drawingSize * drawingSize * 4 + 100));
+      }
+
+      function validBatch(userId) {
+        let batchValidate = exists(/databases/$(database)/documents/users/$(userId)) && getAfter(/databases/$(database)/documents/users/$(userId)).data.timestamp == request.time;
+        return batchValidate;
+      }
+
   }
 }

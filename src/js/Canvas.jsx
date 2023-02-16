@@ -25,7 +25,12 @@ class Canvas extends React.Component {
     }
 
     componentDidUpdate(prevProps) {
-        if (prevProps.array !== this.props.array)
+        if (prevProps.size !== this.props.size) {
+            this.cellLength = this.canvasRef.current.width / (this.props.dimension || 100);
+            if (this.props.array)
+                this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
+        }
+        else if (prevProps.array !== this.props.array)
             this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
     }
 

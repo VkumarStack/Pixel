@@ -1,6 +1,6 @@
 import { auth, db } from './firebase'
 import { doc, getDoc, writeBatch} from 'firebase/firestore'
-import {createUserWithEmailAndPassword, signOut } from 'firebase/auth'
+import {createUserWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup } from 'firebase/auth'
 import React, { useRef, useState, useEffect } from "react"
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { useNavigate } from "react-router-dom"
@@ -15,6 +15,7 @@ function Register() {
     const passwordRef = useRef(0);
     const confirmPasswordRef = useRef(0);
     const navigate = useNavigate();
+    const provider = new GoogleAuthProvider();
 
     useEffect(() => {
         async function getUsername(usr) {
@@ -35,44 +36,12 @@ function Register() {
             <div className="Register">
                 <form onSubmit={(e) => {
                     e.preventDefault();
-                    createUserWithEmailAndPassword(auth, e.target.email.value, e.target.password.value)
-                    .catch((error) => {
-                        console.log(error.message);
-                        setErrorMessage("Invalid registration");
-                    });
+                    signInWithPopup(auth, provider)
+                        .catch((error) => {
+                            console.log(error.message);
+                            setErrorMessage("Invalid registration");
+                        })
                 }}>
-                    <div className="form-pair">
-                        <label htmlFor="email">Email</label>
-                        <input type="email" id="email" name="email" required/>
-                    </div>
-                    <div className="form-pair">
-                        <label htmlFor="password">Password</label>
-                        <input type="password" id="password" name="password" ref={passwordRef}
-                        minLength="6"
-                        pattern="(?=.*[0-9a-zA-Z]).{6,}"
-                        onInvalid={(e) => {e.target.setCustomValidity("Password must be a minimum of six characters long")}}
-                        onChange={(e) => {
-                            if (e.target.value !== confirmPasswordRef.current.value)
-                                confirmPasswordRef.current.setCustomValidity("Passwords must match");
-                            else
-                                confirmPasswordRef.current.setCustomValidity("");
-                            e.target.setCustomValidity("");
-                        }}
-                        required/>
-                    </div>
-                    <div className="form-pair">
-                        <label htmlFor="confirm-password">Confirm Password</label>
-                        <input type="password" id="confirm-password" name="confirm-password" ref={confirmPasswordRef}
-                        minLength="6"
-                        pattern="(?=.*[0-9a-zA-Z]).{6,}" 
-                        onChange={(e) => {
-                            if (e.target.value !== passwordRef.current.value)
-                                e.target.setCustomValidity("Passwords must match");
-                            else
-                                e.target.setCustomValidity("");
-                        }}
-                        required/>
-                    </div>
                     <button type="submit">Register Account</button>
                 </form>
                 { (errorMessage !== null) && 

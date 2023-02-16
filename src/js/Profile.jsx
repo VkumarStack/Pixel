@@ -5,6 +5,7 @@ import { db, auth } from './firebase';
 import { doc, getDoc, setDoc, onSnapshot, updateDoc, runTransaction, serverTimestamp } from 'firebase/firestore';
 import { useParams } from 'react-router-dom';
 import Canvas from './Canvas';
+import Post from './Post';
 
 function Profile() {
     let { username } = useParams();
@@ -16,8 +17,8 @@ function Profile() {
     const avatar = useRef(null);
     let unsub;
 
-    
     function profileRender() {
+        console.log(profile);
         if (user && user.uid === value.data().uid)
             return (
                 <div className="SignedInSelfProfile">
@@ -37,12 +38,15 @@ function Profile() {
                         <textarea name="bio" id="bio" cols="30" rows="10"></textarea>
                         <button type='submit'> Edit Bio </button>
                     </form>
+                    <Post></Post>
                 </div>
             );
         else if (user)
             return (
                 <div className="SignedInOtherProfile">
+                    <Canvas dimension="50" size="100px" editable={false} array={profile.avatar} ref={avatar}></Canvas>
                     <h1> {profile.username} </h1>
+                    <h1>{profile.bio}</h1>
                     <button onClick={async (e) => {
                         await runTransaction(db, async (transaction) => {
                             const followerRef = doc(db, "users", user.uid, "following", value.data().uid);
@@ -66,7 +70,9 @@ function Profile() {
         else 
             return (
                 <div className="SignedOutProfile">
+                    <Canvas dimension="50" size="100px" editable={false} array={profile.avatar} ref={avatar}></Canvas>
                     <h1> {profile.username} </h1>
+                    <h1>{profile.bio}</h1>
                 </div>
             );
     }
@@ -84,14 +90,6 @@ function Profile() {
 
     return(
         <div className="Profile">
-            <button onClick={async (e) => {
-                await runTransaction(db, async (transaction) => {
-                    const ref = doc(db, 'users', 'iIcfecUShCpUEyp4gJ8JqwVSFccl', 'following', 'deeznuts');
-                    const ref2 = doc(db, 'users', 'deeznuts', 'followers', 'iIcfecUShCpUEyp4gJ8JqwVSFccl');
-                    transaction.set(ref, {time: serverTimestamp()});
-                    transaction.set(ref2, {time: serverTimestamp()});
-                });
-            }}> TEST </button>
             {(error || errorProfile) && <h1> Something went wrong... </h1> }
             {(loading || loadProfile) && <h1> Loading... </h1> }
             {value && !value.data() && <h1> User does not exist! </h1> }
