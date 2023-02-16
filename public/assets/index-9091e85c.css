@@ -1,0 +1,1 @@
+.Canvas canvas{touch-action:none;border:solid black}.SignIn{position:relative;display:flex;flex-direction:column}.SignIn form{position:absolute;top:40px}.Header{display:flex;justify-content:space-between}.Header .auth-buttons{display:flex;gap:10px}
