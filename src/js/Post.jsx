@@ -1,9 +1,8 @@
 import React, {useRef} from "react";
 import { db, auth } from './firebase';
 import { getAuth } from "firebase/auth";
-import { doc, getDoc, setDoc, onSnapshot, updateDoc, runTransaction, serverTimestamp, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { useDocument } from 'react-firebase-hooks/firestore';
-import { useAuthState } from 'react-firebase-hooks/auth';
 import Canvas from "./Canvas";
 
 
@@ -12,13 +11,11 @@ function Post() {
     const postRef = useRef(null);
 
     const submitPost = async function(e) {
-        console.log(postRef);
         const batch = writeBatch(db);
         const postDoc = doc(db, "users", getAuth().currentUser.uid, "posts", (new Date()).toISOString().split('T')[0]);
         const userDoc = doc(db, "users", getAuth().currentUser.uid);
         batch.set(postDoc, { data: Array.from(postRef.current.exportCanvas()), time: serverTimestamp() });
         batch.update(userDoc, { timestamp: serverTimestamp() });
-        console.log("commit attempt");
         await batch.commit();
     }
 

@@ -1,15 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { auth, db } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
-import { signOut } from 'firebase/auth';
+import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
-import SignIn from './SignIn';
+import Register from './Register';
 import '../css/Header.css';
 
 function Header() {
     const [user, loading, error] = useAuthState(auth);
+    const [authError, setAuthError] = useState(false);
+    const [registerPopup, setPopup] = useState(false);
     const navigate = useNavigate();
     const location = useLocation();
+    const provider = new GoogleAuthProvider();
+
+    const handleSignIn = (e) => {
+        e.preventDefault();
+        signInWithPopup(auth, provider)
+            .then(async (credential) => {
+                const username = await getDoc(doc(db, "users", credential.user.uid));
+                if (!username.exists())
+                    setPopup(true);
+                else
+                    localStorage.setItem("username", username.data().username);
+            })
+            .catch((error) => {
+                setAuthError(true);
+                setTimeout(() => {setAuthError(false)}, 5000);
+            })
+    }
 
     function buttonRender() {
         if (location.pathname === '/register')
@@ -17,24 +37,17 @@ function Header() {
         if (user)
             return (
                 <div className="sign-out">
-                    <button onClick={(e) => signOut(auth)}> Sign Out </button>
-                </div>
-            );
-        else if (loading)
-            return (
-                <div className="loading">
-                    <h1> Loading... </h1>
+                    <button onClick={(e) => {
+                        signOut(auth);
+                        localStorage.removeItem("username");
+                        }}> Sign Out </button>
                 </div>
             );
         else if (!error)
             return (
-                <div className="auth-buttons">
-                    <SignIn></SignIn>
-                    <div className="register">
-                        <button onClick={(e) => {
-                            navigate("/register");
-                        }}> Register </button>
-                    </div>
+                <div className="sign-in">
+                    <button onClick={handleSignIn}> Sign In </button>
+                    {authError && <h1> Something went wrong with your sign in... </h1>}
                 </div>
             );
     }
@@ -48,6 +61,7 @@ function Header() {
                 <button> SEARCH PLACEHOLDER </button>
             </div>
             { buttonRender() }
+            { registerPopup && <Register setPopup={setPopup}></Register> }
         </div>
     );
 

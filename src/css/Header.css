@@ -7,3 +7,13 @@
     display: flex;
     gap: 10px;
 }
+
+.Header .username-select {
+    position: fixed;
+    left: 50%;
+    top: 25%;
+    background-color: green;
+    min-width: 20%;
+    min-height: 20%;
+    transform: translate(-50%, 0);
+}

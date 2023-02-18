@@ -1,13 +1,13 @@
 import React from "react"
-import '../css/Canvas.css'
 import canvasHelper from './CanvasHelper';
 import Pako from "pako";
+import '../css/Canvas.css'
 
 class Canvas extends React.Component {
     constructor(props) {
         super(props);
-        this.canvasHelper = new canvasHelper(props.dimension || 100);
 
+        this.canvasHelper = new canvasHelper(props.dimension || 100);
         this.canvasRef = React.createRef();
 
         this.clicking = false;
@@ -24,13 +24,14 @@ class Canvas extends React.Component {
             this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
     }
 
+    // Resizing the canvas is fine, but the dimension should NOT be changed
     componentDidUpdate(prevProps) {
         if (prevProps.size !== this.props.size) {
             this.cellLength = this.canvasRef.current.width / (this.props.dimension || 100);
             if (this.props.array)
                 this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
         }
-        else if (prevProps.array !== this.props.array)
+        else if (this.props.array && prevProps.array !== this.props.array)
             this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
     }
 
@@ -121,7 +122,6 @@ class Canvas extends React.Component {
             }
         }
 
-        console.log(Pako.deflate(new Uint8ClampedArray(canvasArray)));
         return Pako.deflate(new Uint8ClampedArray(canvasArray));
     }
 

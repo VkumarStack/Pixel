@@ -16,7 +16,7 @@ function App() {
       <Header></Header>
       <Routes>
         <Route path={'/'} element={<Main/>}></Route>
-        <Route path={'/users/:username'} element={ <Profile/> }></Route>
+        <Route path={'/users/:userid'} element={ <Profile/> }></Route>
         <Route path={'/register'} element={<Register/>}></Route>
       </Routes>
     </BrowserRouter>

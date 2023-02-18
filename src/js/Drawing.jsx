@@ -13,7 +13,6 @@ function Drawing(props) {
 
     useEffect(() => {
         return () => {
-            console.log("Unsubbing");
             unsub();
         }
     }, [])

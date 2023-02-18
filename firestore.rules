@@ -14,9 +14,12 @@ service cloud.firestore {
       }
 
       function validUserUpdate(userId) {
+        let resourceValidate = request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'avatar', 'timestamp']) && request.resource.data.get('bio', '') is string && request.resource.data.get('timestamp', request.time) is timestamp;
         let avatar = request.resource.data.get('avatar', []);
         let avatarSize = 50;
-        return request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'avatar', 'timestamp']) && request.resource.data.get('bio', '') is string && request.resource.data.get('timestamp', request.time) is timestamp && avatar is list && (avatar.size() <= (avatarSize * avatarSize * 4 + 50));
+        // Make sure avatar array size is bound by gzip algorithm maximum
+        let avatarValidate = avatar is list && (avatar.size() <= (avatarSize * avatarSize * 4 + 50));
+        return resourceValidate && avatarValidate;
       }
 
       match /usernames/{username} {
@@ -68,7 +71,12 @@ service cloud.firestore {
 
       match /users/{userId}/posts/{date} {
         allow read: if true;
-        allow write: if request.auth.uid == userId && validDate(date) && validData() && validBatch(userId);
+        allow write: if validPostCreate(userId, date);
+      }
+
+      function validPostCreate(userId, date) {
+        let resourceValidate = (request.auth.uid == userId) && validData();
+        return resourceValidate && validDate(date) && validBatch(userId);
       }
 
       function validDate(date) {
@@ -79,8 +87,9 @@ service cloud.firestore {
       }
 
       function validData() {
+        let drawing = request.resource.data.get('data', []);
         let drawingSize = 100;
-        return request.resource.data.keys().hasOnly(['data', 'time']) && request.resource.data.time == request.time && request.resource.data.data is list && (request.resource.data.data.size() <= (drawingSize * drawingSize * 4 + 100));
+        return request.resource.data.keys().hasOnly(['data', 'time']) && request.resource.data.time == request.time && drawing is list && (drawing.size() <= (drawingSize * drawingSize * 4 + 100));
       }
 
       function validBatch(userId) {
