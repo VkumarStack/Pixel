@@ -5,6 +5,7 @@ import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Register from './Register';
+import Search from './Search';
 import '../css/Header.css';
 
 function Header() {
@@ -58,7 +59,7 @@ function Header() {
                 <h1> LOGO PLACEHOLDER </h1>
             </div>
             <div className="search">
-                <button> SEARCH PLACEHOLDER </button>
+                <Search></Search>
             </div>
             { buttonRender() }
             { registerPopup && <Register setPopup={setPopup}></Register> }

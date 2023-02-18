@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef, startTransition } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db, auth } from './firebase';
-import { doc, getDoc, onSnapshot, collection, query, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
-import { useAuthState, useSignOut } from 'react-firebase-hooks/auth';
+import {  collection, query, orderBy, startAfter, limit, getDocs } from 'firebase/firestore';
+import { useAuthState } from 'react-firebase-hooks/auth';
 import Drawing from './Drawing';
 import InfiniteScroll from 'react-infinite-scroll-component';
 
@@ -30,9 +30,9 @@ function Timeline() {
     async function paginate() {
         let result;
         if (lastVisible.current == null)
-            result = query(collection(db, "users", user.uid, "following"), orderBy("time"), limit(1));
+            result = query(collection(db, "users", user.uid, "following"), orderBy("time"), limit(paginate_length));
         else
-            result = query(collection(db, "users", user.uid, "following"), orderBy("time"), startAfter(lastVisible.current), limit(1));
+            result = query(collection(db, "users", user.uid, "following"), orderBy("time"), startAfter(lastVisible.current), limit(paginate_length));
         const snapshots = await getDocs(result);
         if (snapshots.docs.length < paginate_length)
             setMore(false);
