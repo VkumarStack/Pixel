@@ -3,7 +3,7 @@ import { debounce } from "lodash";
 import { db } from './firebase';
 import { collection, getDocs, query, where, limit, documentId } from "firebase/firestore";
 import { Link } from "react-router-dom";
-import SearchBar from "../css/Search.css"
+import "../css/Search.css"
 
 function Search() {
     const [users, setUsers] = useState([]);

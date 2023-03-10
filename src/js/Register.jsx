@@ -3,7 +3,7 @@ import { doc, writeBatch} from 'firebase/firestore'
 import React, { useState } from "react"
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { onAuthStateChanged } from 'firebase/auth'
-import style from "../css/Register.css"
+import "../css/Register.css"
 
 
 function Register(props) {

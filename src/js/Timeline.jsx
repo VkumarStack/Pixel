@@ -6,7 +6,7 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import Drawing from './Drawing';
 import InfiniteScroll from 'react-infinite-scroll-component';
 import useIsScrollable from './useIsScrollable';
-import style from '../css/Timeline.css'
+import '../css/Timeline.css'
 
 const paginate_length = 1;
 

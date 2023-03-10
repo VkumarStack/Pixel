@@ -154,7 +154,6 @@ class Canvas extends React.Component {
             return (
                 <div className="Canvas">
                     <canvas ref={this.canvasRef} 
-                    width="500px" height="500px"
                     style={{aspectRatio: "1 / 1"}}
                     onMouseDown={(e) => this.handleClick(e, false)}
                     onMouseUp={(e) => { this.clicking = false; }}
