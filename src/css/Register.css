@@ -1,0 +1,35 @@
+.Register {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    
+    position: fixed;
+    left: 50%;
+    top: 25%;
+
+    color: #d4d4d4;
+    background-color: #0369a1;
+    border-radius: 10px;
+
+
+    min-width: 20%;
+    min-height: 20%;
+    transform: translate(-50%, 0);
+
+    padding: 10px;
+}
+
+.Register form, .Register .form-pair {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.Register label {
+    font-size: 20px;
+}
+
+.Register h1 {
+    font-size: 25px;
+    font-weight: bold;
+}

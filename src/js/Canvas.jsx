@@ -7,32 +7,56 @@ class Canvas extends React.Component {
     constructor(props) {
         super(props);
 
-        this.canvasHelper = new canvasHelper(props.dimension || 100);
+        this.dimension = props.dimension || 100;
+        this.canvasHelper = new canvasHelper(this.dimension);
         this.canvasRef = React.createRef();
 
         this.clicking = false;
         this.prevPos = { x: null, y: null};
         this.color = "#000000";
         this.width = 1;
+        this.ctx = null;
+        this.obsv = new ResizeObserver(entries => {
+            entries.forEach(entry => {
+                this.cellLength = entry.contentRect.width / (this.dimension);
+                this.ctx.canvas.width = entry.contentRect.width;
+                this.ctx.canvas.height = entry.contentRect.height;
+                if (this.props.array) {
+                    try {
+                        this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
+                    }
+                    catch (e) {
+                        console.log(e);
+                    }
+                }
+            })
+        })
 
     }
 
     componentDidMount() {
-        this.ctx = this.canvasRef.current.getContext('2d', {willReadFrequently: true});
-        this.cellLength = this.canvasRef.current.width / (this.props.dimension || 100);
-        if (this.props.array)
-            this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
+        this.ctx = this.canvasRef.current.getContext('2d', {willReadFrequently: true}); 
+        this.cellLength = this.canvasRef.current.width / (this.dimension);
+        this.obsv.observe(this.canvasRef.current);
+        if (this.props.array) {
+            try {
+                this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
+            }
+            catch (e) {
+                console.log(e);
+            }
+        }
     }
 
-    // Resizing the canvas is fine, but the dimension should NOT be changed
     componentDidUpdate(prevProps) {
-        if (prevProps.size !== this.props.size) {
-            this.cellLength = this.canvasRef.current.width / (this.props.dimension || 100);
-            if (this.props.array)
+        if (this.props.array && prevProps.array !== this.props.array) {
+            try {
                 this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
+            }
+            catch (e) {
+                console.log(e);
+            }
         }
-        else if (this.props.array && prevProps.array !== this.props.array)
-            this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
     }
 
     handleClick(e, mobile) {
@@ -109,9 +133,9 @@ class Canvas extends React.Component {
     }
 
     exportCanvas() {
-        let canvasArray = Array(4 * (this.props.dimension || 100) * (this.props.dimension || 100));
-        for (let r = 0, i = 0; r < (this.props.dimension || 100) && i < canvasArray.length; r++) {
-            for (let c = 0; c < (this.props.dimension || 100) && i < canvasArray.length; c++, i+= 4) {
+        let canvasArray = Array(4 * this.dimension * this.dimension);
+        for (let r = 0, i = 0; r < this.dimension && i < canvasArray.length; r++) {
+            for (let c = 0; c < this.dimension && i < canvasArray.length; c++, i+= 4) {
                 const pos = this.canvasHelper.convertToGridUnits(this.cellLength, {x: c, y: r});
                 const imageData = this.ctx.getImageData(pos.x, pos.y, 1, 1);
                 const data = imageData.data;
@@ -129,7 +153,9 @@ class Canvas extends React.Component {
         if (this.props.editable)
             return (
                 <div className="Canvas">
-                    <canvas width={this.props.size || "500px"} height={this.props.size || "500px"} ref={this.canvasRef} 
+                    <canvas ref={this.canvasRef} 
+                    width="500px" height="500px"
+                    style={{aspectRatio: "1 / 1"}}
                     onMouseDown={(e) => this.handleClick(e, false)}
                     onMouseUp={(e) => { this.clicking = false; }}
                     onMouseLeave={(e) => { 
@@ -140,14 +166,22 @@ class Canvas extends React.Component {
                     onTouchMove={(e) => this.handleMouseMove(e, true)}
                     onTouchStart={(e) => { this.handleClick(e, true) }}
                     onTouchEnd={(e) => { this.clicking = false; }}/>
-                    <input type="color" onChange={(e) => {this.color = e.target.value }}/>
-                    <input type="range" name="width" id="width" min="1" max="5" defaultValue="1" onChange={(e) => {this.width = e.target.value}}/>
+                    <div className="input-controls">
+                        <div className="input-pair">
+                            <input type="color" name = "color" id="color" onChange={(e) => {this.color = e.target.value }}/>
+                            <h1>Color</h1>
+                        </div>
+                        <div className="input-pair">
+                            <input type="range" name="width" id="width" min="1" max="5" defaultValue="1" onChange={(e) => {this.width = e.target.value}}/>
+                            <h1>Width</h1>
+                        </div>
+                    </div>
                 </div>
             );
         else 
             return (
                 <div className="Canvas">
-                    <canvas width={this.props.size || "500px"} height={this.props.size || "500px"} ref={this.canvasRef} />
+                    <canvas ref={this.canvasRef} style={{aspectRatio: "1 / 1"}}/>
                 </div>
             );
     }

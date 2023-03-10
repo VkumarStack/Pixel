@@ -2,10 +2,18 @@ import { auth, db } from './firebase'
 import { doc, writeBatch} from 'firebase/firestore'
 import React, { useState } from "react"
 import { useAuthState } from 'react-firebase-hooks/auth'
+import { onAuthStateChanged } from 'firebase/auth'
+import style from "../css/Register.css"
+
 
 function Register(props) {
     const [user, loading, error] = useAuthState(auth);
     const [usernameError, setUsernameError] = useState(null);
+
+    onAuthStateChanged(auth, (user) => {
+        if (!user)
+            props.setPopup(false);
+    })
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -28,10 +36,10 @@ function Register(props) {
 
     if (user)
         return ( 
-            <div className="username-select">
+            <div className="Register">
                 <form onSubmit={handleSubmit}>
                     <div className="form-pair">
-                        <label htmlFor="username">Username</label>
+                        <label htmlFor="username"> Select a username </label>
                         <input type="text" id="username" name="username" minLength="3" pattern="[A-Za-z0-9_]{3,24}"
                         onInvalid={(e) => {
                             e.target.setCustomValidity("Please input a username between 3 and 24 characters containing only letters, digits, and underscores.")

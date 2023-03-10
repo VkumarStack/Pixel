@@ -40,8 +40,9 @@ service cloud.firestore {
       }
 
       function validFollower(userId, id) {
-        let resourceValidate = (request.auth.uid == id) && request.resource.data.keys().hasOnly(['time']) && request.resource.data.time is timestamp;
-        let batchValidate = exists(/databases/$(database)/documents/users/$(id)) && existsAfter(/databases/$(database)/documents/users/$(id)/following/$(userId));
+        let follower = get(/databases/$(database)/documents/users/$(id));
+        let resourceValidate = (request.auth.uid == id) && request.resource.data.keys().hasOnly(['time', 'username']) && request.resource.data.time is timestamp && (request.resource.data.username == follower.data.username);
+        let batchValidate = (follower != null) && existsAfter(/databases/$(database)/documents/users/$(id)/following/$(userId));
         return resourceValidate && batchValidate; 
       }
 
@@ -54,13 +55,19 @@ service cloud.firestore {
       match /users/{userId}/following/{id} {
         allow read: if true;
         allow create: if validFollowing(userId, id);
-        allow delete: if validFollowingDelete(userId, id)
+        allow update: if validFollowingUpdate(userId);
+        allow delete: if validFollowingDelete(userId, id);
       }
 
       function validFollowing(userId, id) {
-        let resourceValidate = (request.auth.uid == userId) && request.resource.data.keys().hasOnly(['time']) && request.resource.data.time is timestamp;
-        let batchValidate = exists(/databases/$(database)/documents/users/$(id)) && existsAfter(/databases/$(database)/documents/users/$(id)/followers/$(userId));
+        let following = get(/databases/$(database)/documents/users/$(id));
+        let resourceValidate = (request.auth.uid == userId) && request.resource.data.keys().hasOnly(['time', 'username']) && request.resource.data.time is timestamp && (request.resource.data.username == following.data.username);
+        let batchValidate = (following != null) && existsAfter(/databases/$(database)/documents/users/$(id)/followers/$(userId));
         return resourceValidate && batchValidate;
+      }
+
+      function validFollowingUpdate(userId) {
+        return (request.auth.uid == userId) && request.resource.data.keys().hasOnly(['time']) && request.resource.data.time is timestamp;
       }
 
       function validFollowingDelete(userId, id) {

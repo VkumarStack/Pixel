@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { auth, db } from './firebase';
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { GoogleAuthProvider, signInWithPopup, signOut } from 'firebase/auth';
@@ -37,18 +38,22 @@ function Header() {
             return;
         if (user)
             return (
-                <div className="sign-out">
+                <div className="auth-buttons">
                     <button onClick={(e) => {
                         signOut(auth);
                         localStorage.removeItem("username");
-                        }}> Sign Out </button>
+                        }}> 
+                    Sign Out </button>
+                    <button onClick={(e) => {
+                        navigate("/users/" + user.uid);
+                    }}>
+                    Profile </button>
                 </div>
             );
         else if (!error)
             return (
-                <div className="sign-in">
+                <div className="auth-buttons">
                     <button onClick={handleSignIn}> Sign In </button>
-                    {authError && <h1> Something went wrong with your sign in... </h1>}
                 </div>
             );
     }
@@ -56,11 +61,9 @@ function Header() {
     return(
         <div className="Header">
             <div className="logo">
-                <h1> LOGO PLACEHOLDER </h1>
+                <h1> <Link to={"/"}> Pixel </Link> </h1>
             </div>
-            <div className="search">
-                <Search></Search>
-            </div>
+            <Search></Search>
             { buttonRender() }
             { registerPopup && <Register setPopup={setPopup}></Register> }
         </div>

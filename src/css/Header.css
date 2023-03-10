@@ -1,19 +1,50 @@
+@font-face {
+    font-family: "04b_30";
+    src: url(../assets/04B_30__.TTF);
+}
+
 .Header {
+    width: 100%;
+    box-sizing: border-box;
+    position: sticky;
+    top: 0;
     display: flex;
     justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    background-color: #0369a1;
+    padding: 10px 15px;
+    box-shadow: 0px 5px 5px #164e63;
+    z-index: 1;
+}
+
+.Header .logo h1 {
+    font-family: "04b_30";
+    font-size: 40px;
+    color: #171717;
+}
+
+.Header .logo h1:hover {
+    color: #d4d4d4;
 }
 
 .Header .auth-buttons {
     display: flex;
-    gap: 10px;
+    align-self: center;
+    gap: 5px;
 }
 
-.Header .username-select {
-    position: fixed;
-    left: 50%;
-    top: 25%;
-    background-color: green;
-    min-width: 20%;
-    min-height: 20%;
-    transform: translate(-50%, 0);
+
+@media only screen and (max-width: 600px) {
+    .Header .logo h1 {
+        font-size: 20px;
+    }
+
+    .Header .auth-buttons {
+        flex-direction: column;
+    }
+
+    .Header button {
+        width: 100px;
+    }
 }

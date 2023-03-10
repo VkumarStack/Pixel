@@ -1,0 +1,51 @@
+.SearchBar {
+    width: 40%;
+}
+
+.SearchBar input {
+    width: 100%;
+}
+
+.SearchBar input:focus+ul {
+    display: block;
+    position: absolute;
+    z-index: 1;
+    width: inherit;
+}
+
+.SearchBar ul:hover {
+    display: block;
+    position: absolute;
+    width: inherit;
+}
+
+.SearchBar ul {
+    display: none;
+    
+    margin-top: 5px;
+
+    list-style: none;
+
+    border-radius: 10px;
+
+    background-color: #0c4a6e;
+}
+
+.SearchBar ul:empty {
+    padding: 0px;
+    height: 0px;
+}
+
+.SearchBar li {
+    padding: 15px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+    font-weight: bold;
+    color: #d4d4d4;
+}
+
+.SearchBar li:hover {
+    background-color: #166390;
+}

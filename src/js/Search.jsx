@@ -1,17 +1,21 @@
 import React, { useState } from "react";
 import { debounce } from "lodash";
 import { db } from './firebase';
-import { doc, collection, FieldPath, getDocs, query, where, limit, documentId} from "firebase/firestore";
+import { collection, getDocs, query, where, limit, documentId } from "firebase/firestore";
 import { Link } from "react-router-dom";
+import SearchBar from "../css/Search.css"
 
 function Search() {
     const [users, setUsers] = useState([]);
     const findUsers = async function(e) {    
-        if (e.target.value.length === 0)
+        if (e.target.value.length === 0 || !e.target.checkValidity()) {
+            setUsers([]);
             return;
+        }
         const start = e.target.value;
         const end = start.slice(0, start.length - 1) + (String.fromCharCode(start.charCodeAt(start.length - 1) + 1));
         const q = query(collection(db, "usernames"), where(documentId(), ">=", start), where(documentId(), "<", end), limit(10));
+        
         const docs = await getDocs(q);
         const links = [];
         docs.forEach((doc) => {
@@ -22,8 +26,9 @@ function Search() {
     }
     return (
         <div className="SearchBar">
-            <input type="text" placeholder="Find a user" onChange={debounce( (e) => findUsers(e), 500)}/>
-            {users}
+            <input type="text" pattern="[A-Za-z0-9_]+" 
+            placeholder="Find a user" onChange={debounce( (e) => findUsers(e), 500)}/>
+            <ul> {users} </ul>
         </div>
     );
 }

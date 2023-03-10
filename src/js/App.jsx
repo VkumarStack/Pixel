@@ -1,14 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { useState } from 'react'
-import '../css/App.css'
-import { db } from './firebase'
-import {collection, query, orderBy, onSnapshot, getDocs, getDoc, doc, updateDoc, serverTimestamp, Timestamp } from 'firebase/firestore'
-import Canvas from './Canvas'
 import Register from './Register'
 import Header from './Header'
 import Profile from './Profile'
-import Drawing from './Drawing'
 import Timeline from './Timeline'
+import '../css/App.css'
 
 function App() {
   return (
