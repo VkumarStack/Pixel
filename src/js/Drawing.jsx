@@ -1,13 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Link } from 'react-router-dom';
 import { db, auth } from './firebase';
-import { doc, onSnapshot } from 'firebase/firestore';
+import { doc } from 'firebase/firestore';
+import { useDocument } from 'react-firebase-hooks/firestore';
 import Canvas from './Canvas';
+import '../css/Drawing.css'
 
 function Drawing(props) {
-    
+    const [user, loading, error] = useDocument(doc(db, "users", props.user))
+
     if (props.data) 
         return (
             <div className="Drawing">
+                { loading && <Link> Loading... </Link> }
+                { user && user.exists() && <Link to={"/users/" + props.user}> {user.data().username} </Link> }
                 <Canvas dimension="100" size="500px" editable={false} array={props.data}></Canvas>
             </div>
         );

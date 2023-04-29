@@ -14,7 +14,7 @@ service cloud.firestore {
       }
 
       function validUserUpdate(userId) {
-        let resourceValidate = request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'avatar', 'timestamp']) && request.resource.data.get('bio', '') is string && request.resource.data.get('timestamp', request.time) is timestamp;
+        let resourceValidate = request.auth.uid == userId && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['bio', 'avatar', 'timestamp']) && request.resource.data.get('bio', '') is string && request.resource.data.get('bio', '').size() < 255 && request.resource.data.get('timestamp', request.time) is timestamp;
         let avatar = request.resource.data.get('avatar', []);
         let avatarSize = 50;
         // Make sure avatar array size is bound by gzip algorithm maximum

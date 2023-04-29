@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth";
 import { doc, serverTimestamp, writeBatch } from 'firebase/firestore';
 import { useDocument } from 'react-firebase-hooks/firestore';
 import Canvas from "./Canvas";
+import '../css/Post.css'
 
 
 function Post() {

@@ -10,11 +10,11 @@ class CanvasHelper {
     } 
 
     convertToCellUnits(cellLength, pos) {
-        return { x: Math.floor(pos.x / cellLength), y: Math.floor(pos.y / cellLength)};
+        return { x: Math.ceil(pos.x / cellLength), y: Math.ceil(pos.y / cellLength)};
     }
 
     convertToGridUnits(cellLength, pos) {
-        return { x: pos.x * cellLength, y: pos.y * cellLength };
+        return { x: Math.ceil(pos.x * cellLength), y: Math.ceil(pos.y * cellLength) };
     }
     
     importCanvas(cellLength, ctx, data) {

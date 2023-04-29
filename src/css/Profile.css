@@ -57,9 +57,20 @@
     padding: 5px;
 }
 
+.Profile .self-profile .Canvas {
+    width: 100px;
+    height: 100px;
+}
+
+.Profile .editable .Canvas {
+    width: 300px;
+    height: 300px;
+}
+
 @media only screen and (max-width: 600px) {
     .Profile {
         flex-direction: column;
-        justify-content: flex-start;
+        align-items: center;
+        height: auto;
     }
 }

@@ -8,6 +8,7 @@ import Drawing from "./Drawing";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Post from "./Post";
 const paginate_length = 1;
+import '../css/UserDrawings.css'
 
 function UserDrawings(props) {
     const [user, authLoading, authError] = useAuthState(auth);
@@ -57,7 +58,7 @@ function UserDrawings(props) {
     function mapDrawings() {
         let result = [];
         for (const property in drawings) {
-            result.push( <Drawing key={property} data={drawings[property].data}></Drawing> )
+            result.push( <Drawing key={property} user={props.user} data={drawings[property].data}></Drawing> )
         }
         return result;
     }
@@ -74,8 +75,8 @@ function UserDrawings(props) {
                 loader={<h1>Loading...</h1>}
                 scrollableTarget={"UserDrawings"}
             >
-                { (snapshot && snapshot.exists()) && (user && user.uid !== props.user)  && <Drawing data={snapshot.data().data}></Drawing>}
-                { (snapshot && snapshot.exists()) && (user && user.uid === props.user)  && <Post></Post>}
+                { (snapshot && snapshot.exists()) && (user && user.uid !== props.user)  && <Drawing user={props.user} data={snapshot.data().data}></Drawing>}
+                { (snapshot) && (user && user.uid === props.user)  && <Post></Post>}
                 { mapDrawings() }
             </InfiniteScroll>
         </div>

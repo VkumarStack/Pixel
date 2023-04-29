@@ -1,0 +1,16 @@
+.UserDrawings {
+    height: 100%;
+}
+
+.UserDrawings .Drawing {
+    width: 400px;
+}
+
+@media only screen and (max-width: 600px) {
+    .UserDrawings {
+        width: 100%;
+    }
+    .UserDrawings .Drawing {
+        width: 100%;
+    }
+}

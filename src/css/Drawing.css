@@ -1,0 +1,23 @@
+.Drawing {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+
+    padding: 5px;
+
+    background-color: #0369a1;
+
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.Drawing a {
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.Drawing a:hover {
+    color: white;
+}

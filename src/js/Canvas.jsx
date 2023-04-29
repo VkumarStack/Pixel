@@ -21,6 +21,9 @@ class Canvas extends React.Component {
                 this.cellLength = entry.contentRect.width / (this.dimension);
                 this.ctx.canvas.width = entry.contentRect.width;
                 this.ctx.canvas.height = entry.contentRect.height;
+                console.log(this.ctx.canvas.width);
+                console.log(this.ctx.canvas.height);
+                console.log(this.cellLength)
                 if (this.props.array) {
                     try {
                         this.canvasHelper.importCanvas(this.cellLength, this.ctx, Pako.inflate(new Uint8ClampedArray(this.props.array)));
@@ -145,14 +148,13 @@ class Canvas extends React.Component {
                 canvasArray[i + 3] = data[3];
             }
         }
-
         return Pako.deflate(new Uint8ClampedArray(canvasArray));
     }
 
     render() {
         if (this.props.editable)
             return (
-                <div className="Canvas">
+                <div className="Canvas editable">
                     <canvas ref={this.canvasRef} 
                     style={{aspectRatio: "1 / 1"}}
                     onMouseDown={(e) => this.handleClick(e, false)}
@@ -173,6 +175,14 @@ class Canvas extends React.Component {
                         <div className="input-pair">
                             <input type="range" name="width" id="width" min="1" max="5" defaultValue="1" onChange={(e) => {this.width = e.target.value}}/>
                             <h1>Width</h1>
+                        </div>
+                        <div className="input-pair">
+                            <button type="button" 
+                            onClick={(e) => this.ctx.clearRect(0, 0, this.canvasRef.current.width, this.canvasRef.current.height)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1920 1920">
+                                    <path d="M960 0v112.941c467.125 0 847.059 379.934 847.059 847.059 0 467.125-379.934 847.059-847.059 847.059-467.125 0-847.059-379.934-847.059-847.059 0-267.106 126.607-515.915 338.824-675.727v393.374h112.94V112.941H0v112.941h342.89C127.058 407.38 0 674.711 0 960c0 529.355 430.645 960 960 960s960-430.645 960-960S1489.355 0 960 0" fillRule="evenodd"/>
+                                </svg>
+                            </button>
                         </div>
                     </div>
                 </div>

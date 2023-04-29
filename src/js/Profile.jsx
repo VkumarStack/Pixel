@@ -13,6 +13,7 @@ function Profile() {
     const [snapshot, docLoading, docError] = useDocument(doc(db, "users", userid));
     const [authUser, authLoading, authError] = useAuthState(auth);
     const [following, setFollowing] = useState(false);
+    const [edit, setEdit] = useState(false);
     const avatar = useRef(null);
     let unsub = null;
 
@@ -52,14 +53,16 @@ function Profile() {
         let ownPage = authUser && authUser.uid === userid;
         if (snapshot.exists())
             return (
-                <div className="profile-container">
+                <div className={"profile-container" + ((ownPage && " self-profile") || "") + ((edit && " editable") || "")}>
                     <div className="icon-container">
                         <h1> {snapshot.data().username} </h1>
-                        <Canvas dimension="50" size="300px" editable={ownPage} array={snapshot.data().avatar} ref={avatar}></Canvas>
-                        { ownPage && 
+                        <Canvas dimension="50" size="300px" editable={ownPage && edit} array={snapshot.data().avatar} ref={avatar}></Canvas>
+                        { (ownPage && edit) && 
                             <button onClick={(e) => {
                                 updateDoc(doc(db, "users", authUser.uid), { avatar: Array.from(avatar.current.exportCanvas()) });
                             }}>Update Icon</button> }
+                        { (ownPage) &&
+                            <button onClick={(e) => setEdit(!edit) }> Edit Profile </button> }
                     </div>
                     { ownPage && 
                     <form className="bio-container" onSubmit={(e) => {
