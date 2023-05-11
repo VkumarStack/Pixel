@@ -74,6 +74,7 @@ function UserDrawings(props) {
                 hasMore={more}
                 loader={<h1>Loading...</h1>}
                 scrollableTarget={"UserDrawings"}
+                style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', width: '100%'}}
             >
                 { (snapshot && snapshot.exists()) && (user && user.uid !== props.user)  && <Drawing user={props.user} data={snapshot.data().data}></Drawing>}
                 { (snapshot) && (user && user.uid === props.user)  && <Post></Post>}

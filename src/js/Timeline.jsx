@@ -91,6 +91,7 @@ function Timeline(props) {
                     hasMore={more}
                     loader={<h1>Loading...</h1>}
                     scrollableTarget={"Timeline"}
+                    style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '5px', width: '100%'}}
                 >
                     { mapDrawings() }
                 </InfiniteScroll>
