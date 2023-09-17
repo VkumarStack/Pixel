@@ -20,9 +20,9 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 
 // EMULATOR FUNCTIONALITIES, REMOVE FOR PRODUCTION
-/*
+
 connectFirestoreEmulator(db, 'localhost', 8080);
 connectAuthEmulator(auth, 'http://127.0.0.1:9099');
-*/
+
 
 export {db, auth}

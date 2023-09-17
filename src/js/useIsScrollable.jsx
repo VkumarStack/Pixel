@@ -12,6 +12,7 @@ const useIsScrollable = (dependencies) => {
     useLayoutEffect(() => {
         if (!node)
             return;
+        console.log(node.scrollHeight + " : " + node.clientHeight);
         setIsScrollable(node.scrollHeight > node.clientHeight);
     }, [...dependencies, node]);
 

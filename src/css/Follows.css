@@ -1,0 +1,38 @@
+.Follows {
+    width: 250px;
+}
+
+.ProfilePortion a {
+    display: flex;
+    flex-direction: row;
+    justify-content: baseline;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    width: 200px;
+    border-radius: 5px;
+    background-color: #0c4a6e;
+}
+
+
+.ProfilePortion a:hover {
+    background-color: #166390;
+}
+
+
+.ProfilePortion .Canvas {
+    height: 50px;
+    width: 50px;
+    flex-shrink: 0;
+}
+
+.ProfilePortion .text-container {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.ProfilePortion h1 {
+    font-size: 25px;
+    font-weight: bold;
+}

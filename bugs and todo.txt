@@ -1,0 +1,7 @@
+- add friend list to check
+- drawings should have date
+- comments for drawings - not allowed to comment on drawings other than today's
+- drawable reactions for drawings
+- message for empty timeline - go follow some people
+- random users to follow suggestion
+- increase size of drawable canvas for posts

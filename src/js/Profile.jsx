@@ -92,6 +92,11 @@ function Profile() {
     
     return(
         <div className="Profile">
+            <div className="profile-modes">
+                <button> Profile </button>
+                <button> Followers </button>
+                <button> Following </button>
+            </div>
             {(authError || docError) && <h1> Something went wrong... </h1> }
             {(authLoading || docLoading) && <h1> Loading... </h1> }
             {snapshot && profileRender()} 
@@ -99,5 +104,7 @@ function Profile() {
         </div>
     );
 }
+
+
 
 export default Profile;

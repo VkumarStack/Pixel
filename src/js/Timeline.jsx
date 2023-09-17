@@ -8,7 +8,7 @@ import InfiniteScroll from 'react-infinite-scroll-component';
 import useIsScrollable from './useIsScrollable';
 import '../css/Timeline.css'
 
-const paginate_length = 1;
+const paginate_length = 3;
 
 function Timeline(props) {
     const [user, loading, error] = useAuthState(auth);
@@ -84,7 +84,8 @@ function Timeline(props) {
     if (user)
         return(
             <div className="Timeline"
-                ref={ref}>
+                ref={ref}
+                style={{height: "100%"}}>
                 <InfiniteScroll
                     dataLength={Object.keys(drawings).length}
                     next={paginate}

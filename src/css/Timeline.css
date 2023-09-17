@@ -1,17 +1,17 @@
 .Timeline {
     height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
 }
 
-.Timeline .Canvas {
+.Timeline .Drawing {
     width: 400px;    
 }
 
 
 @media only screen and (max-width: 600px) { 
-    .Timeline Canvas {
-        width: 90vw;
+    .Timeline {
+        width: 100%;
+    }
+    .Timeline .Drawing {
+        width: 90%;
     }
 }

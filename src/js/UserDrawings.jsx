@@ -7,8 +7,9 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import Drawing from "./Drawing";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Post from "./Post";
-const paginate_length = 1;
 import '../css/UserDrawings.css'
+
+const paginate_length = 3;
 
 function UserDrawings(props) {
     const [user, authLoading, authError] = useAuthState(auth);
